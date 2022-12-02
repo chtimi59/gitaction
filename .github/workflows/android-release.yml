@@ -1,0 +1,32 @@
+name: Android release
+
+on:
+  release:
+    types:
+      - created
+
+jobs:
+  setup: 
+    runs-on: ubuntu-latest
+    outputs:
+      isProd: ${{ steps.meta.outputs.isProd }}
+    steps:
+      - uses: actions/checkout@v3
+      - id: meta
+        run: |
+          IS_PROD=no
+          if [[ $GITHUB_REF =~ ^refs/tags/.+\+android(\+|$) ]]; then
+            IS_PROD=yes
+          fi
+          echo "isProd=${IS_PROD}" >>$GITHUB_OUTPUT
+          echo "isProd ${IS_PROD}"
+
+  build:
+    name: Build everthing, test and report
+    runs-on: ubuntu-latest
+    needs: [setup]
+    if: needs.setup.outputs.isProd == 'yes'
+    steps:
+      - name: boo
+        run: |          
+          echo "Hello!"
